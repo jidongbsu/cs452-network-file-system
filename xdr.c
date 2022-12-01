@@ -1,14 +1,11 @@
 /*
  * XDR support for nfsd/protocol version 3.
  *
- * Copyright (C) 1995, 1996, 1997 Olaf Kirch <okir@monad.swb.de>
- *
- * 2003-08-09 Jamie Lokier: Use htonl() for nanoseconds, not htons()!
  */
 
 #include <linux/namei.h>
 #include <linux/sunrpc/svc_xprt.h>
-#include "xdr3.h"
+#include "xdr.h"
 #include "netns.h"
 #include "vfs.h"
 
@@ -29,10 +26,9 @@ decode_time3(__be32 *p, struct timespec *time)
  * this byte count itself is 4 bytes, the byte count does not include any pad bytes, but in XDR, any data item that is not
  * a multiple of 4 bytes in lengths must be padded with zero bytes. With these padding bytes, the whole object will now contain an integral number of 4-byte units. */
 static __be32 *
-decode_fh(__be32 *p, struct svc_fh *fhp)
+decode_file_handle(__be32 *p, struct svc_fh *fhp)
 {
-	unsigned int size = 0;
-	return p + XDR_QUADLEN(size);
+	return p;
 }
 
 static __be32 *
@@ -51,10 +47,9 @@ encode_fh(__be32 *p, struct svc_fh *fhp)
  * the file name's data type is string, and in XDR, a string is encoded as variable-length opaque data.
  */
 static __be32 *
-decode_filename(__be32 *p, char **namp, unsigned int *lenp)
+decode_file_name(__be32 *p, char **namp, unsigned int *lenp)
 {
-	unsigned int len = 0;
-        return p + XDR_QUADLEN(len);
+        return p;
 }
 
 static __be32 *
@@ -159,7 +154,7 @@ encode_post_op_attr(struct svc_rqst *rqstp, __be32 *p, struct svc_fh *fhp)
 int
 nfs3svc_decode_fhandle(struct svc_rqst *rqstp, __be32 *p, struct nfsd_fhandle *args)
 {
-	p = decode_fh(p, &args->fh);
+	p = decode_file_handle(p, &args->fh);
 	if (!p)
 		return 0;
 	return xdr_argsize_check(rqstp, p);
@@ -169,7 +164,7 @@ int
 nfs3svc_decode_sattrargs(struct svc_rqst *rqstp, __be32 *p,
 					struct nfsd3_sattrargs *args)
 {
-	p = decode_fh(p, &args->fh);
+	p = decode_file_handle(p, &args->fh);
 	if (!p)
 		return 0;
 	p = decode_sattr3(p, &args->attrs);
@@ -199,7 +194,7 @@ nfs3svc_decode_sattrargs(struct svc_rqst *rqstp, __be32 *p,
 int nfs3svc_decode_diropargs(struct svc_rqst *rqstp, __be32 *p,
 					struct nfsd3_diropargs *args)
 {
-	if (!(p = decode_fh(p, &args->fh)) || !(p = decode_filename(p, &args->name, &args->len))){
+	if (!(p = decode_file_handle(p, &args->fh)) || !(p = decode_file_name(p, &args->name, &args->len))){
 		/* if p is NULL, something is wrong, return 0. */
 		return 0;
 	}
@@ -213,7 +208,7 @@ int
 nfs3svc_decode_accessargs(struct svc_rqst *rqstp, __be32 *p,
 					struct nfsd3_accessargs *args)
 {
-	p = decode_fh(p, &args->fh);
+	p = decode_file_handle(p, &args->fh);
 	if (!p)
 		return 0;
 	args->access = ntohl(*p++);
@@ -229,7 +224,7 @@ nfs3svc_decode_readargs(struct svc_rqst *rqstp, __be32 *p,
 	int v;
 	u32 max_blocksize = svc_max_payload(rqstp);
 
-	p = decode_fh(p, &args->fh);
+	p = decode_file_handle(p, &args->fh);
 	if (!p)
 		return 0;
 	p = xdr_decode_hyper(p, &args->offset);
@@ -260,7 +255,7 @@ nfs3svc_decode_writeargs(struct svc_rqst *rqstp, __be32 *p,
 	struct kvec *head = rqstp->rq_arg.head;
 	struct kvec *tail = rqstp->rq_arg.tail;
 
-	p = decode_fh(p, &args->fh);
+	p = decode_file_handle(p, &args->fh);
 	if (!p)
 		return 0;
 	p = xdr_decode_hyper(p, &args->offset);
@@ -307,8 +302,8 @@ int
 nfs3svc_decode_createargs(struct svc_rqst *rqstp, __be32 *p,
 					struct nfsd3_createargs *args)
 {
-	if (!(p = decode_fh(p, &args->fh))
-	 || !(p = decode_filename(p, &args->name, &args->len)))
+	if (!(p = decode_file_handle(p, &args->fh))
+	 || !(p = decode_file_name(p, &args->name, &args->len)))
 		return 0;
 
 	switch (args->createmode = ntohl(*p++)) {
@@ -330,8 +325,8 @@ int
 nfs3svc_decode_mkdirargs(struct svc_rqst *rqstp, __be32 *p,
 					struct nfsd3_createargs *args)
 {
-	if (!(p = decode_fh(p, &args->fh)) ||
-	    !(p = decode_filename(p, &args->name, &args->len)))
+	if (!(p = decode_file_handle(p, &args->fh)) ||
+	    !(p = decode_file_name(p, &args->name, &args->len)))
 		return 0;
 	p = decode_sattr3(p, &args->attrs);
 
@@ -342,7 +337,7 @@ int
 nfs3svc_decode_readdirargs(struct svc_rqst *rqstp, __be32 *p,
 					struct nfsd3_readdirargs *args)
 {
-	p = decode_fh(p, &args->fh);
+	p = decode_file_handle(p, &args->fh);
 	if (!p)
 		return 0;
 	p = xdr_decode_hyper(p, &args->cookie);
@@ -362,7 +357,7 @@ nfs3svc_decode_readdirplusargs(struct svc_rqst *rqstp, __be32 *p,
 	int len;
 	u32 max_blocksize = svc_max_payload(rqstp);
 
-	p = decode_fh(p, &args->fh);
+	p = decode_file_handle(p, &args->fh);
 	if (!p)
 		return 0;
 	p = xdr_decode_hyper(p, &args->cookie);

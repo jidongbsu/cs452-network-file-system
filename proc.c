@@ -8,7 +8,7 @@
 #include <linux/ext2_fs.h>
 #include <linux/magic.h>
 
-#include "xdr3.h"
+#include "xdr.h"
 #include "vfs.h"
 
 #define RETURN_STATUS(st)	{ resp->status = (st); return (st); }

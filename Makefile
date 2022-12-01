@@ -23,7 +23,7 @@ bmw:
 obj-m += bmw.o
 
 bmw-objs := bmw_main.o nfssvc.o nfsfh.o vfs.o \
-			   export.o nfs3proc.o nfs3xdr.o
+			   export.o proc.o xdr.o
 
 clean:
 	make -C $(KERNEL_SOURCE) M=$(PWD) clean

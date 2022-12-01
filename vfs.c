@@ -29,7 +29,7 @@
 #include <linux/writeback.h>
 #include <linux/security.h>
 
-#include "xdr3.h"
+#include "xdr.h"
 #include "nfsd.h"
 #include "vfs.h"
 
