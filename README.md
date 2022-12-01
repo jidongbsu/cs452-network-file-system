@@ -4,8 +4,9 @@ In this assignment, we will write a Linux kernel module called bmw. This module 
 
 ## Learning Objectives
 
-- Learning how network file systems (NFS) work
-- Understanding the concept of remote procedure calls (RPC) and how they can be implemented
+- Learning how network file systems (NFS) work.
+- Understanding the concept of remote procedure calls (RPC) and how they can be implemented.
+- Being able to explain why endianess conversion is needed when writing network programs.
 
 ## Important Notes
 
