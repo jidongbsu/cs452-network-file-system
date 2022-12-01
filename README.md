@@ -85,6 +85,16 @@ Both structures are used to describe file handles, and they will both be used in
 
 The TCP/IP standard network byte order is big-endian; x86 processors are little-endian. Therefore, when receiving bytes from the network, we need to convert them into the machine's order; and before sending bytes out, we need to convert them to the network order. In this assignment, we use *ntohl*() to convert network bytes into machine bytes, and use *htonl*() to convert machine bytes to network bytes. Here *ntohl* is short for "network to host long", and *htonl* is short for "host to network long". You will see these two functions in the next section of this README.
 
+### eXternal Data Representation (XDR)
+
+External data representation (XDR) is a standard for the description and encoding of data. Network protocols like the NFS use XDR to describe their data formats. In XDR, the representation of all data items requires a multiple of 4 bytes (or 32 bits) of data. The bytes are numbered 0 through n -1. The bytes are read or written to some byte stream such that byte m always precedes byte m+1. The n bytes are followed by enough (0 to 3) residual zero bytes, r, to make the total byte count a multiple of four. The following figure illustrates such a representation.
+
+![alt text](xdr1.jpg "Data Represenation in XDR")
+
+In addition, when sending a data item where the number of bytes is not known to the recipient, XDR typically requires the sender to have a prepended integer containing the byte count. The byte count itself occupies 4 bytes, and it does not include any pad bytes. A data item with this byte count is shown below.
+
+![alt text](xdr2.jpg "Data Represenation in XDR")
+
 ## Specification
 
 ### Starter Code
