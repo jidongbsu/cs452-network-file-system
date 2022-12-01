@@ -31,6 +31,7 @@ decode_time3(__be32 *p, struct timespec *time)
 static __be32 *
 decode_fh(__be32 *p, struct svc_fh *fhp)
 {
+	unsigned int size = 0;
 	return p + XDR_QUADLEN(size);
 }
 
@@ -52,6 +53,7 @@ encode_fh(__be32 *p, struct svc_fh *fhp)
 static __be32 *
 decode_filename(__be32 *p, char **namp, unsigned int *lenp)
 {
+	unsigned int len = 0;
         return p + XDR_QUADLEN(len);
 }
 
