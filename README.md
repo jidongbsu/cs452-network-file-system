@@ -234,7 +234,7 @@ the function will increment p by 8 bytes, so you should not increment p by yours
 7. write stat->blocks to p. Again, the file's used blocks (in bytes) is a 64-bit integer, yet p is a 32-bit pointer, write the used blocks (in bytes) to p is therefore a little tricky, you can use the following function to do so.
 
 ```c
-p = xdr_encode_hyper(p, ((u64)stat->blocks) << 9);
+p = xdr_encode_hyper(p, ((u64)stat->blocks) << 9);	// we left shift 9 bits here, because in current Linux systems, block size is 512 bytes, which is 2^9.
 ```
 again, the function will increment p by 8 bytes, so you should not increment p by yourself in this step.
 
