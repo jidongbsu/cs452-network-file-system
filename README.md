@@ -81,9 +81,13 @@ typedef struct svc_fh {
 
 Both structures are used to describe file handles, and they will both be used in this program.
 
-# Specification
+### Big Endian vs Little Endian
 
-## Starter Code
+The TCP/IP standard network byte order is big-endian; x86 processors are little-endian. Therefore, when receiving bytes from the network, we need to convert them into the machine's order; and before sending bytes out, we need to convert them to the network order. In this assignment, we use *ntohl*() to convert network bytes into machine bytes, and use *htonl*() to convert machine bytes to network bytes. Here *ntohl* is short for "network to host long", and *htonl* is short for "host to network long". You will see these two functions in the next section of this README.
+
+## Specification
+
+### Starter Code
 
 The starter code looks like this:
 
@@ -100,7 +104,7 @@ What this module does is: It starts a kernel thread, which calls the function *n
 
 **Note**: because the purpose of these requests is to invoke RPC calls, such requests are therefore referred to as call requests.
 
-## Functions You Need to Implement
+### Functions You Need to Implement
 
 Here are the prototypes of the functions that you need to implement in xdr.c:
 
@@ -138,7 +142,7 @@ struct fattr3 {
 
 Similar to the request message, the reply message also goes as a stream of data. When *encode_fattr3*() is called, *p* is pointing to this stream, and the goal of *encode_fattr3*() is to encode the above fattr3 structure into the memory location which is pointed to by *p*. When implementing *encode_fattr3*(), you can obtain the value of each field of this *fattr3* structure from *fhp* and *stat*, which is the third and the fourth parameter of *encode_fattr3*().
 
-## Implementing decode_file_handle()
+### Implementing decode_file_handle()
 
 ```c
 static __be32 * decode_file_handle(__be32 *p, struct svc_fh *fhp);
@@ -154,7 +158,7 @@ The file handle is a variable-length object, and according to the XDR standard, 
 6. increment p by the file handle's size, plus any possible padding bytes. For example, if the file handle's size is 23 bytes, then increment p by 24 bytes; if the file handle's size is 6 bytes, then increment p by 8 bytes.
 7. return p.
 
-## Implementing decode_file_name()
+### Implementing decode_file_name()
 
 ```c
 static __be32 * decode_file_name(__be32 *p, char **namp, unsigned int *lenp);
@@ -177,7 +181,7 @@ printk(KERN_INFO "the file name is: %.*s\n", len, *namp);
 
 this printk statement will print *len* bytes of the file name, which does not have a null byte (i.e., '\0') at its end.
 
-## Implementing encode_fattr3()
+### Implementing encode_fattr3()
 
 ```c
 static __be32 * encode_fattr3(struct svc_rqst *rqstp, __be32 *p, struct svc_fh *fhp, struct kstat *stat);
@@ -197,9 +201,9 @@ this macro returns 1 if it's a directory.
 increment p by 4 bytes.
 
 2. write stat->mode to p. increment p by 4 bytes. (use *htonl*() here)
-3. write stat->nlink to p. increment p by 4 bytes.
-4. write stat->uid.val to p. increment p by 4 bytes.
-5. write stat->gid.val to p. increment p by 4 bytes.
+3. write stat->nlink to p. increment p by 4 bytes. (use *htonl*() here)
+4. write stat->uid.val to p. increment p by 4 bytes. (use *htonl*() here)
+5. write stat->gid.val to p. increment p by 4 bytes. (use *htonl*() here)
 6. write stat->size to p. Note that the file's size is a 64-bit integer, yet p is a 32-bit pointer, write the size to p is therefore a little trick, you can use the following function to do so.
 
 ```c
