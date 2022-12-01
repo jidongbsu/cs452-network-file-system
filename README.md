@@ -19,6 +19,8 @@ You are recommended to read these two book chapters:
 
 [Network File System](https://pages.cs.wisc.edu/~remzi/OSTEP/dist-nfs.pdf). This chapter explains what are the commonly used RPC calls in the NFS protocol.
 
+If you are interested in NFS and its implementation in general, or want to understand various details of the starter code, the book "NFS Illustrated" written by Brent Callaghan is what you are recommended to read.
+
 ## Background
 
 ### File Handle vs Inode
