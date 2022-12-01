@@ -149,7 +149,7 @@ The file handle is a variable-length object, and according to the XDR standard, 
 1. call *memset()* to set *fhp* to 0.
 2. set fhp->fh_maxsize to 64 bytes, as that's the maximum size of our file handles.
 3. read 4 bytes from p, and that will be the size of this file handle. 
-4. save the size in fhp->fh_handle.fh_size and  increment p by 4 bytes because these 4 bytes are just read.
+4. save the size in fhp->fh_handle.fh_size (use *ntohl*() here) and  increment p by 4 bytes because these 4 bytes are just read.
 5. keep reading from p, this time we read the actual file handle. you can use memcpy to copy the file handle from p to &fhp->fh_handle.fh_base.
 6. increment p by the file handle's size, plus any possible padding bytes. For example, if the file handle's size is 23 bytes, then increment p by 24 bytes; if the file handle's size is 6 bytes, then increment p by 8 bytes.
 7. return p.
@@ -162,7 +162,7 @@ static __be32 * decode_file_name(__be32 *p, char **namp, unsigned int *lenp);
 
 Similarly, the file name is also a variable-length object, and according to the XDR standard, a variable-length object usually has a prepended integer containing the byte count, which tells us the size of this object, which in this case, is the file name. (in the context of a file name, size actually means the length of this file name). The byte count itself consumes 4 bytes. Also, according to the XDR standard, any data item that is not a multiple of 4 bytes in lengths must be padded with zero bytes. With these padding bytes, the whole object will now contain an integral number of 4-byte units. With such knowledge, now you can following these steps to implement *decode_file_name*():
 
-1. read 4 bytes from p, and that will be the length of the file name. save it in the address pointed to by *lenp*.
+1. read 4 bytes from p, and that will be the length of the file name. save it in the address pointed to by *lenp*. (use *ntohl*() here)
 2. increment p by 4 bytes because these 4 bytes are just read.
 3. let *name* point to p. 
 4. increment p by the file name's length (in bytes), plus any possible padding bytes. For example, if the file name is 5 bytes long, then increment p by 8 bytes; if the file name is 10 bytes long, then increment p by 12 bytes.
@@ -178,6 +178,59 @@ printk(KERN_INFO "the file name is: %.*s\n", len, *namp);
 this printk statement will print *len* bytes of the file name, which does not have a null byte (i.e., '\0') at its end.
 
 ## Implementing encode_fattr3()
+
+```c
+static __be32 * encode_fattr3(struct svc_rqst *rqstp, __be32 *p, struct svc_fh *fhp, struct kstat *stat);
+```
+When a REMOVE RPC call is finished, the server calls *encode_fattr3*() to encode the parent directory's attributes in *p*. In addition, other RPC calls may also send back a file's attributes to the client. Thus, when *encode_fattr3*() is called, *stat* could mean the stat of a file, or the stat of a directory. Both cases should be considered, and directory is just a special type of file.
+
+you can following these steps to implement *encode_fattr3*():
+
+1. if stat represents a file, write 1 into p; if stat represents a directory, write 2 into p. (use *htonl*() here) you can use this macro to determine it's a file or a directory:
+
+```c
+S_ISDIR(stat->mode)
+```
+
+this macro returns 1 if it's a directory.
+
+increment p by 4 bytes.
+
+2. write stat->mode to p. increment p by 4 bytes. (use *htonl*() here)
+3. write stat->nlink to p. increment p by 4 bytes.
+4. write stat->uid.val to p. increment p by 4 bytes.
+5. write stat->gid.val to p. increment p by 4 bytes.
+6. write stat->size to p. Note that the file's size is a 64-bit integer, yet p is a 32-bit pointer, write the size to p is therefore a little trick, you can use the following function to do so.
+
+```c
+p = xdr_encode_hyper(p, (u64) stat->size);
+```
+the function will increment p by 8 bytes, so you should not increment p by yourself in this step.
+
+7. write stat->blocks to p. Again, the file's used blocks (in bytes) is a 64-bit integer, yet p is a 32-bit pointer, write the used blocks (in bytes) to p is therefore a little trick, you can use the following function to do so.
+
+```c
+p = xdr_encode_hyper(p, ((u64)stat->blocks) << 9);
+```
+again, the function will increment p by 8 bytes, so you should not increment p by yourself in this step.
+
+8. the file is stored on some device. in this step, we write the device information to p, and the information include major device number and minor device number. You can get the major device number using this macro: MAJOR(stat->rdev), and get the minor device number via this macro: MINOR(stat->rdev).
+
+increment p by 4 bytes after writing the major device number to p; and then increment p by 4 bytes after writing the minor device number to p. (use *htonl*() here)
+
+9. write the file system id to p. Again, the file system's id is a 64-bit integer, yet p is a 32-bit pointer. you can once again use *xdr_encode_hyper*(), and write it like this:
+
+```c
+p = xdr_encode_hyper(p, (u64)huge_encode_dev(fhp->fh_dentry->d_inode->i_sb->s_dev));
+```
+
+again, the function will increment p by 8 bytes, so you should not increment p by yourself in this step.
+
+10. write the inode number (stat->ino) to p. this once again is a 64 bit integer, and you should already know which function to call.
+11. write the access time to p. The access time includes stat->atime.tv_sec and stat->atime.tv_nsec, each is 32-bit. increment p by 4 bytes after write stat->atime.tv_sec to p, and also increment p by 4 bytes after writing stat->atime.tv_nsec to p.
+12. write the access time to p. The access time includes stat->mtime.tv_sec and stat->mtime.tv_nsec, each is 32-bit. increment p by 4 bytes after write stat->mtime.tv_sec to p, and also increment p by 4 bytes after writing stat->mtime.tv_nsec to p.
+13. write the access time to p. The access time includes stat->ctime.tv_sec and stat->ctime.tv_nsec, each is 32-bit. increment p by 4 bytes after write stat->ctime.tv_sec to p, and also increment p by 4 bytes after writing stat->ctime.tv_nsec to p. (use *htonl*() in step 11, 12, and 13)
+14. return p.
 
 ## Testing
 
