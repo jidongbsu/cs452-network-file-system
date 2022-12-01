@@ -224,14 +224,14 @@ increment p by 4 bytes.
 3. write stat->nlink to p. increment p by 4 bytes. (use *htonl*() here)
 4. write stat->uid.val to p. increment p by 4 bytes. (use *htonl*() here)
 5. write stat->gid.val to p. increment p by 4 bytes. (use *htonl*() here)
-6. write stat->size to p. Note that the file's size is a 64-bit integer, yet p is a 32-bit pointer, write the size to p is therefore a little trick, you can use the following function to do so.
+6. write stat->size to p. Note that the file's size is a 64-bit integer, yet p is a 32-bit pointer, write the size to p is therefore a little tricky, you can use the following function to do so.
 
 ```c
 p = xdr_encode_hyper(p, (u64) stat->size);
 ```
 the function will increment p by 8 bytes, so you should not increment p by yourself in this step.
 
-7. write stat->blocks to p. Again, the file's used blocks (in bytes) is a 64-bit integer, yet p is a 32-bit pointer, write the used blocks (in bytes) to p is therefore a little trick, you can use the following function to do so.
+7. write stat->blocks to p. Again, the file's used blocks (in bytes) is a 64-bit integer, yet p is a 32-bit pointer, write the used blocks (in bytes) to p is therefore a little tricky, you can use the following function to do so.
 
 ```c
 p = xdr_encode_hyper(p, ((u64)stat->blocks) << 9);
