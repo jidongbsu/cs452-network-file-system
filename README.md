@@ -156,6 +156,27 @@ The file handle is a variable-length object, and according to the XDR standard, 
 
 ## Implementing decode_file_name()
 
+```c
+static __be32 * decode_file_name(__be32 *p, char **namp, unsigned int *lenp);
+```
+
+Similarly, the file name is also a variable-length object, and according to the XDR standard, a variable-length object usually has a prepended integer containing the byte count, which tells us the size of this object, which in this case, is the file name. (in the context of a file name, size actually means the length of this file name). The byte count itself consumes 4 bytes. Also, according to the XDR standard, any data item that is not a multiple of 4 bytes in lengths must be padded with zero bytes. With these padding bytes, the whole object will now contain an integral number of 4-byte units. With such knowledge, now you can following these steps to implement *decode_file_name*():
+
+1. read 4 bytes from p, and that will be the length of the file name. save it in the address pointed to by *lenp*.
+2. increment p by 4 bytes because these 4 bytes are just read.
+3. let *name* point to p. 
+4. increment p by the file name's length (in bytes), plus any possible padding bytes. For example, if the file name is 5 bytes long, then increment p by 8 bytes; if the file name is 10 bytes long, then increment p by 12 bytes.
+5. return p.
+
+
+**Note**: you are recommended to use this special trick to print the file name:
+
+```c
+printk(KERN_INFO "the file name is: %.*s\n", len, *namp);
+```
+
+this printk statement will print *len* bytes of the file name, which does not have a null byte (i.e., '\0') at its end.
+
 ## Implementing encode_fattr3()
 
 ## Testing
