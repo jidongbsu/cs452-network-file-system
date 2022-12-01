@@ -140,7 +140,11 @@ Similar to the request message, the reply message also goes as a stream of data.
 
 ## Implementing decode_file_handle()
 
-The file handle is a variable-length object, and according to the XDR standard, a variable-length object usually has a prepended integer containing the byte count, which tells us the size of this object, which in this case, is the file handle. The byte count itself consumes 4 bytes. Also, according to the XDR standard, any data item that is not a multiple of 4 bytes in lengths must be padded with zero bytes. With these padding bytes, the whole object will now contain an integral number of 4-byte units. With such knowledge, now you can following these steps to implement *decode_file_handle(__be32 *p, struct svc_fh *fhp)*:
+```c
+static __be32 * decode_file_handle(__be32 *p, struct svc_fh *fhp);
+```
+
+The file handle is a variable-length object, and according to the XDR standard, a variable-length object usually has a prepended integer containing the byte count, which tells us the size of this object, which in this case, is the file handle. The byte count itself consumes 4 bytes. Also, according to the XDR standard, any data item that is not a multiple of 4 bytes in lengths must be padded with zero bytes. With these padding bytes, the whole object will now contain an integral number of 4-byte units. With such knowledge, now you can following these steps to implement *decode_file_handle*():
 
 1. call *memset()* to set *fhp* to 0.
 2. set fhp->fh_maxsize to 64 bytes, as that's the maximum size of our file handles.
