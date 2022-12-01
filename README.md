@@ -271,6 +271,8 @@ And then export this directory in /etc/exports, your /etc/exports should look li
 /opt/test1 *(rw,sync,no_root_squash)
 ```
 
+This line is saying, we want the server's /opt/test1 directory to be available to every other computer in the same network. And other computers just need to mount the server's /opt/test1 directory into their directory tree.
+
 #### Regular Testing
 
 Run the following commands to load the kernel module and start the NFS service:
@@ -327,6 +329,7 @@ After this, you can test the NFS file system within this /tmp/mnt directory. You
 When all tests are done, leave this /tmp/mnt and run this *umount* command to unmount the NFS file system.
 
 ```console
+[cs452@xyno ~]$ cd
 [cs452@xyno ~]$ sudo umount /tmp/mnt
 ```
 
