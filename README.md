@@ -231,9 +231,9 @@ p = xdr_encode_hyper(p, (u64)huge_encode_dev(fhp->fh_dentry->d_inode->i_sb->s_de
 again, the function will increment p by 8 bytes, so you should not increment p by yourself in this step.
 
 10. write the inode number (stat->ino) to p. this once again is a 64 bit integer, and you should already know which function to call.
-11. write the access time to p. The access time includes stat->atime.tv_sec and stat->atime.tv_nsec, each is 32-bit. increment p by 4 bytes after write stat->atime.tv_sec to p, and also increment p by 4 bytes after writing stat->atime.tv_nsec to p.
-12. write the access time to p. The access time includes stat->mtime.tv_sec and stat->mtime.tv_nsec, each is 32-bit. increment p by 4 bytes after write stat->mtime.tv_sec to p, and also increment p by 4 bytes after writing stat->mtime.tv_nsec to p.
-13. write the access time to p. The access time includes stat->ctime.tv_sec and stat->ctime.tv_nsec, each is 32-bit. increment p by 4 bytes after write stat->ctime.tv_sec to p, and also increment p by 4 bytes after writing stat->ctime.tv_nsec to p. (use *htonl*() in step 11, 12, and 13)
+11. write the last access time to p. The access time includes stat->atime.tv_sec and stat->atime.tv_nsec, each is 32-bit. increment p by 4 bytes after write stat->atime.tv_sec to p, and also increment p by 4 bytes after writing stat->atime.tv_nsec to p.
+12. write the last modify time to p. The modify time includes stat->mtime.tv_sec and stat->mtime.tv_nsec, each is 32-bit. increment p by 4 bytes after write stat->mtime.tv_sec to p, and also increment p by 4 bytes after writing stat->mtime.tv_nsec to p.
+13. write the last attributes change time to p. The attributes change time includes stat->ctime.tv_sec and stat->ctime.tv_nsec, each is 32-bit. increment p by 4 bytes after write stat->ctime.tv_sec to p, and also increment p by 4 bytes after writing stat->ctime.tv_nsec to p. (use *htonl*() in step 11, 12, and 13)
 14. return p.
 
 ## Testing
