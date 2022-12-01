@@ -322,7 +322,7 @@ Next, run *cd* to enter into this directory.
 [cs452@xyno ~]$ cd /tmp/mnt
 ```
 
-After this, you can test the NFS file system within this /tmp/mnt directory. You are required to test commands including *touch*, *mkdir*, *ls -l*, *rm -f*, *rmdir*. You are suggested to use *vi* to edit files, and then use *cat* to read the file.
+After this, you can test the NFS file system within this /tmp/mnt directory. You are required to test commands including *touch*, *mkdir*, *ls -l*, *rm -f*, *rmdir*. You can use *vi* or *echo* to edit files, and then use *cat* to read the file.
 
 When all tests are done, leave this /tmp/mnt and run this *umount* command to unmount the NFS file system.
 
