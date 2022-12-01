@@ -168,7 +168,7 @@ Similar to the request message, the reply message also goes as a stream of data.
 static __be32 * decode_file_handle(__be32 *p, struct svc_fh *fhp);
 ```
 
-The file handle is a variable-length object, and according to the XDR standard, a variable-length object usually has a prepended integer containing the byte count, which tells us the size of this object, which in this case, is the file handle. The byte count itself consumes 4 bytes. Also, according to the XDR standard, any data item that is not a multiple of 4 bytes in lengths must be padded with zero bytes. With these padding bytes, the whole object will now contain an integral number of 4-byte units. With such knowledge, now you can following these steps to implement *decode_file_handle*():
+The file handle is a variable-length object, and according to the XDR standard, a variable-length object usually has a prepended integer containing the byte count, which tells us the size of this object, which in this case, is the file handle. The byte count itself consumes 4 bytes. Also, according to the XDR standard, any data item that is not a multiple of 4 bytes in lengths must be padded with zero bytes. With these padding bytes, the whole object will now contain an integral number of 4-byte units. With such knowledge, now you can follow these steps to implement *decode_file_handle*():
 
 1. call *memset()* to set *fhp* to 0.
 2. set fhp->fh_maxsize to 64 bytes, as that's the maximum size of our file handles.
@@ -184,7 +184,7 @@ The file handle is a variable-length object, and according to the XDR standard, 
 static __be32 * decode_file_name(__be32 *p, char **namp, unsigned int *lenp);
 ```
 
-Similarly, the file name is also a variable-length object, and according to the XDR standard, a variable-length object usually has a prepended integer containing the byte count, which tells us the size of this object, which in this case, is the file name. (in the context of a file name, size actually means the length of this file name). The byte count itself consumes 4 bytes. Also, according to the XDR standard, any data item that is not a multiple of 4 bytes in lengths must be padded with zero bytes. With these padding bytes, the whole object will now contain an integral number of 4-byte units. With such knowledge, now you can following these steps to implement *decode_file_name*():
+Similarly, the file name is also a variable-length object, and according to the XDR standard, a variable-length object usually has a prepended integer containing the byte count, which tells us the size of this object, which in this case, is the file name. (in the context of a file name, size actually means the length of this file name). The byte count itself consumes 4 bytes. Also, according to the XDR standard, any data item that is not a multiple of 4 bytes in lengths must be padded with zero bytes. With these padding bytes, the whole object will now contain an integral number of 4-byte units. With such knowledge, now you can follow these steps to implement *decode_file_name*():
 
 1. read 4 bytes from p, and that will be the length of the file name. save it in the address pointed to by *lenp*. (use *ntohl*() here)
 2. increment p by 4 bytes because these 4 bytes are just read.
@@ -208,7 +208,7 @@ static __be32 * encode_fattr3(struct svc_rqst *rqstp, __be32 *p, struct svc_fh *
 ```
 When a REMOVE RPC call is finished, the server calls *encode_fattr3*() to encode the parent directory's attributes in *p*. In addition, other RPC calls may also send back a file's attributes to the client. Thus, when *encode_fattr3*() is called, *stat* could mean the stat of a file, or the stat of a directory. Both cases should be considered, and directory is just a special type of file.
 
-you can following these steps to implement *encode_fattr3*():
+you can follow these steps to implement *encode_fattr3*():
 
 1. if stat represents a file, write 1 into p; if stat represents a directory, write 2 into p. (use *htonl*() here) you can use this macro to determine it's a file or a directory:
 
