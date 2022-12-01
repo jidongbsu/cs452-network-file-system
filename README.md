@@ -330,6 +330,82 @@ When all tests are done, leave this /tmp/mnt and run this *umount* command to un
 [cs452@xyno ~]$ sudo umount /tmp/mnt
 ```
 
+## Expected Results
+
+### Current State
+
+Before you implement anything, if you compile the starter code, load the kernel module, and then go to the client side, and  mount the file system on the client side, you will get:
+
+```console
+[cs452@xyno ~]$ sudo mount -t nfs 192.168.56.114:/opt/test1 /tmp/mnt
+mount.nfs: Protocol not supported
+```
+
+In other words, the mount itself will fail.
+
+### After Implementation
+
+The following tests show that mount succeeds. And then file creation (touch), directory creation (mkdir), and directory list (ls -l) are all successful.
+
+```console
+[cs452@xyno ~]$ sudo mount -t nfs 192.168.56.114:/opt/test1 /tmp/mnt
+[cs452@xyno ~]$ cd /tmp/mnt/
+[cs452@xyno mnt]$ ls
+[cs452@xyno mnt]$ touch abc
+[cs452@xyno mnt]$ touch bbc
+[cs452@xyno mnt]$ mkdir cdc
+[cs452@xyno mnt]$ ls -l
+total 0
+-rw-rw-r--. 1 cs452 cs452 0 Dec  1  2022 abc
+-rw-rw-r--. 1 cs452 cs452 0 Dec  1  2022 bbc
+drwxrwxr-x. 2 cs452 cs452 6 Dec  1  2022 cdc
+```
+
+The following tests show that file deletion (rm -f), and directory deletion (rmdir) are all successful.
+
+```console
+[cs452@xyno mnt]$ ls -l
+total 0
+-rw-rw-r--. 1 cs452 cs452 0 Dec  1  2022 abc
+-rw-rw-r--. 1 cs452 cs452 0 Dec  1  2022 bbc
+drwxrwxr-x. 2 cs452 cs452 6 Dec  1  2022 cdc
+[cs452@xyno mnt]$ rm -f abc
+[cs452@xyno mnt]$ rm -f bbc
+[cs452@xyno mnt]$ rmdir cdc
+[cs452@xyno mnt]$ ls -l
+total 0
+```
+
+The following tests show that file writing (echo >) and reading (cat) are all successful.
+
+```console
+[cs452@xyno mnt]$ ls -l
+total 0
+[cs452@xyno mnt]$ echo "this is a file" > abab
+[cs452@xyno mnt]$ echo "this is another file" > bbcc
+[cs452@xyno mnt]$ ls -l
+total 8
+-rw-rw-r--. 1 cs452 cs452 15 Dec  1  2022 abab
+-rw-rw-r--. 1 cs452 cs452 21 Dec  1  2022 bbcc
+[cs452@xyno mnt]$ cat abab
+this is a file
+[cs452@xyno mnt]$ cat bbcc
+this is another file
+```
+
+Double confirm from the server side (This step is very important, just so you know the files are indeed created on the server.)
+
+```console
+[cs452@xyno cs452-network-file-system]$ ls -l /opt/test1/
+total 8
+-rw-rw-r--. 1 cs452 cs452 15 Dec  1 04:02 abab
+-rw-rw-r--. 1 cs452 cs452 21 Dec  1 04:02 bbcc
+[cs452@xyno cs452-network-file-system]$ cat /opt/test1/abab 
+this is a file
+[cs452@xyno cs452-network-file-system]$ cat /opt/test1/bbcc 
+this is another file
+```
+
 ## Submission
 
 Due: 23:59pm, December 15th, 2022. Late submission will not be accepted/graded.
