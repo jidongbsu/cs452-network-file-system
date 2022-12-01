@@ -222,12 +222,26 @@ All files necessary for compilation and testing need to be submitted, this inclu
 
 ## Grading Rubric (Undergraduate and Graduate)
 
+- [70 pts] Functional requirements (from client's perspective):
+
+  - file creation works (touch). /10
+  - file read/write works (edit file and then cat). /20
+  - directory creation works (mkdir). /10
+  - directory list works (ls -l). /10
+  - file deletion works (rm -f). /10
+  - directory deletion works when the directory is empty (rmdir). /10
+
 - [10 pts] Compiler warnings:
+
   - Each compiler warning will result in a 3 point deduction.
   - You are not allowed to suppress warnings.
   - You won't get these points if you didn't implement any of the above functional requirements.
 
+- [10 pts] Module can be installed and removed without crashing the system:
+
+  - You won't get these points if your module doesn't implement any of the above functional requirements.
+
 - [10 pts] Documentation:
+
   - README.md file (rename this current README file to README.orig and rename the README.template to README.md.)
   - You are required to fill in every section of the README template, missing 1 section will result in a 2-point deduction.
-
