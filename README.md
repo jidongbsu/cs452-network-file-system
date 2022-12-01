@@ -4,9 +4,20 @@ In this assignment, we will write a Linux kernel module called bmw. This module 
 
 ## Learning Objectives
 
+- Learning how network file systems (NFS) work
+- Understanding the concept of remote procedure calls (RPC) and how they can be implemented
+
 ## Important Notes
 
+You MUST build against the kernel version (3.10.0-1160.el7.x86_64), which is the default version of the kernel installed on the cs452 VM.
+
 ## Book References
+
+You are recommended to read these two book chapters:
+
+[Distributed Systems](https://pages.cs.wisc.edu/~remzi/OSTEP/dist-intro.pdf). This chapter explains what Remote Procedure Calls are and what eXternal Data Representation (XDR) is, both concepts are the foundation of this assignment.
+
+[Network File System](https://pages.cs.wisc.edu/~remzi/OSTEP/dist-nfs.pdf). This chapter explains what are the commonly used RPC calls in the NFS protocol.
 
 ## Background
 
