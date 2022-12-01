@@ -123,6 +123,12 @@ struct fattr3 {
 
 Similar to the request message, the reply message also goes as a stream of data. When *encode_fattr3*() is called, *p* is pointing to this stream, and the goal of *encode_fattr3*() is to encode the above fattr3 structure into the memory location which is pointed to by *p*. When implementing *encode_fattr3*(), you can obtain the value of each field of this *fattr3* structure from *fhp* and *stat*, which is the third and the fourth parameter of *encode_fattr3*().
 
+## Implementing decode_file_handle()
+
+## Implementing decode_file_name()
+
+## Implementing encode_fattr3()
+
 ## Testing
 
 **Note**: in the following, we assume the NFS server's IP address is 192.168.56.114. Replace this ip address with your NFS server's IP address. Before you can test your network file system, make sure there is a network connection between your client and server - for example, they should be able to *ping* each other, and *ssh* to each other.
@@ -139,6 +145,12 @@ The first time (and only the first time), run the following commands to disable 
 [cs452@xyno ~]$ sudo systemctl disable firewalld
 ```
 
+The first time (and only the first time), run the following commands to enable (and start) the rpc service on the server.
+
+```console
+[cs452@xyno ~]$ sudo systemctl enable rpcbind.service
+[cs452@xyno ~]$ sudo systemctl start rpcbind.service
+```
 The first time (and only the first time), run this *mkdir* command to create the export directory /opt/test1.
 
 ```console
@@ -158,7 +170,6 @@ Run the following commands to load the kernel module and start the NFS service:
 
 ```console
 [cs452@xyno ~]$ sudo insmod bmw.ko
-[cs452@xyno ~]$ sudo systemctl start rpcbind.service
 [cs452@xyno ~]$ sudo systemctl start nfs
 ```
 
@@ -204,7 +215,7 @@ Next, run *cd* to enter into this directory.
 [cs452@xyno ~]$ cd /tmp/mnt
 ```
 
-After this, you can test the NFS file system within this /tmp/mnt directory.
+After this, you can test the NFS file system within this /tmp/mnt directory. You are required to test commands including *touch*, *mkdir*, *ls -l*, *rm -f*, *rmdir*. You are suggested to use *vi* to edit files, and then use *cat* to read the file.
 
 When all tests are done, leave this /tmp/mnt and run this *umount* command to unmount the NFS file system.
 
