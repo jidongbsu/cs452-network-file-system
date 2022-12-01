@@ -66,6 +66,21 @@ struct knfsd_fh {
 
 Each file handle represents a file or a directory.
 
+Another structure called *struct svc_fh* is also defined in the starter code.
+
+```c
+typedef struct svc_fh {
+        struct knfsd_fh         fh_handle;      /* FH data */
+        int                     fh_maxsize;     /* max size for fh_handle */
+        struct dentry *         fh_dentry;      /* validated dentry */
+        struct svc_export *     fh_export;      /* export pointer */
+
+        bool                    fh_want_write;  /* remount protection taken */
+} svc_fh;
+```
+
+Both structures are used to describe file handles, and they will both be used in this program.
+
 # Specification
 
 ## Starter Code
@@ -124,6 +139,16 @@ struct fattr3 {
 Similar to the request message, the reply message also goes as a stream of data. When *encode_fattr3*() is called, *p* is pointing to this stream, and the goal of *encode_fattr3*() is to encode the above fattr3 structure into the memory location which is pointed to by *p*. When implementing *encode_fattr3*(), you can obtain the value of each field of this *fattr3* structure from *fhp* and *stat*, which is the third and the fourth parameter of *encode_fattr3*().
 
 ## Implementing decode_file_handle()
+
+The file handle is a variable-length object, and according to the XDR standard, a variable-length object usually has a prepended integer containing the byte count, which tells us the size of this object, which in this case, is the file handle. The byte count itself consumes 4 bytes. Also, according to the XDR standard, any data item that is not a multiple of 4 bytes in lengths must be padded with zero bytes. With these padding bytes, the whole object will now contain an integral number of 4-byte units. With such knowledge, now you can following these steps to implement *decode_file_handle(__be32 *p, struct svc_fh *fhp)*:
+
+1. call *memset()* to set *fhp* to 0.
+2. set fhp->fh_maxsize to 64 bytes, as that's the maximum size of our file handles.
+3. read 4 bytes from p, and that will be the size of this file handle. 
+4. save the size in fhp->fh_handle.fh_size and  increment p by 4 bytes because these 4 bytes are just read.
+5. keep reading from p, this time we read the actual file handle. you can use memcpy to copy the file handle from p to &fhp->fh_handle.fh_base.
+6. increment p by the file handle's size, plus any possible padding bytes. For example, if the file handle's size is 23 bytes, then increment p by 24 bytes; if the file handle's size is 6 bytes, then increment p by 8 bytes.
+7. return p.
 
 ## Implementing decode_file_name()
 
