@@ -89,11 +89,11 @@ The TCP/IP standard network byte order is big-endian; x86 processors are little-
 
 External data representation (XDR) is a standard for the description and encoding of data. Network protocols like the NFS use XDR to describe their data formats. In XDR, the representation of all data items requires a multiple of 4 bytes (or 32 bits) of data. The bytes are numbered 0 through n -1. The bytes are read or written to some byte stream such that byte m always precedes byte m+1. The n bytes are followed by enough (0 to 3) residual zero bytes, r, to make the total byte count a multiple of four. The following figure illustrates such a representation.
 
-![alt text](xdr1.jpg "Data Represenation in XDR")
+![alt text](xdr1.png "Data Represenation in XDR")
 
 In addition, when sending a data item where the number of bytes is not known to the recipient, XDR typically requires the sender to have a prepended integer containing the byte count. The byte count itself occupies 4 bytes, and it does not include any pad bytes. A data item with this byte count is shown below.
 
-![alt text](xdr2.jpg "Data Represenation in XDR")
+![alt text](xdr2.png "Data Represenation in XDR")
 
 ## Specification
 
