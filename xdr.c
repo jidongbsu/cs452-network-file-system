@@ -42,7 +42,7 @@ encode_fh(__be32 *p, struct svc_fh *fhp)
 }
 
 /*
- * Decode a file name and make sure that the path contains
+ * Decode a file name.
  * p represents the stream of data, and at the moment this function gets called, p is pointing to the beginning of the file name.
  * the file name's data type is string, and in XDR, a string is encoded as variable-length opaque data.
  */
