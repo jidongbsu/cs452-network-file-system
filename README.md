@@ -189,7 +189,7 @@ Similarly, the file name is also a variable-length object, and according to the 
 
 1. read 4 bytes from p, and that will be the length of the file name. save it in the address pointed to by *lenp*. (use *ntohl*() here)
 2. increment p by 4 bytes because these 4 bytes are just read.
-3. let *name* point to p. 
+3. let *namp* point to p. **Warning**: the prototype of this *decode_file_name*() function suggests that *namp* is NOT a pointer which points to a char variable, but rather, it is a pointer which points to a pointer. So let *namp* point to p means, when deferencing *namp*, we should get p. Also, remember to cast, otherwise you will get a compiler warning.
 4. increment p by the file name's length (in bytes), plus any possible padding bytes. For example, if the file name is 5 bytes long, then increment p by 8 bytes; if the file name is 10 bytes long, then increment p by 12 bytes.
 5. return p.
 
